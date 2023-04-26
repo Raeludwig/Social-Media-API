@@ -1,0 +1,16 @@
+{
+  "name": "social-media-api",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">\r   <br>\r   <a><img src=\"https://user-images.githubusercontent.com/118871515/216512901-047c0cab-c16f-45e6-a7c8-bc2f10833c85.png\" alt=\"Job Finder\" width=\"200\"></a>\r   <br>\r   Job Finder\r   <br>\r </h1>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.5"
+  }
+}
