@@ -10,7 +10,7 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Get a course
+  // Get a thought
   async getSingleThought(req, res) {
     try {
       const thought = await Thought.findOne({ _id: req.params.thoughtId })
@@ -25,7 +25,7 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Create a course
+  // Create a thought
   async createThought(req, res) {
     try {
       const thought = await Thought.create(req.body);
@@ -35,7 +35,7 @@ module.exports = {
       return res.status(500).json(err);
     }
   },
-  // Delete a course
+  // Delete a thought
   async deleteThought(req, res) {
     try {
       const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
@@ -54,7 +54,7 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Update a course
+  // Update a thought
   async updateThought(req, res) {
     try {
       const thought = await Thought.findOneAndUpdate(
@@ -72,4 +72,25 @@ module.exports = {
       res.status(500).json(err);
     }
   },
+
+  // Create a reaction
+    async createReaction(req, res) {
+      try {
+        const reaction = await Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $addToSet: { reactions: req.body } }, { new: true, runValidators: true });
+        res.json(reaction);
+      } catch (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+    
+},
+async deleteReaction(req, res) {
+  try {
+    const reaction = await Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $pull: { reactions: {reactionId: req.params.reactionId} } }, { new: true, runValidators: true });
+    res.json(reaction);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
+  }
+},
 };
