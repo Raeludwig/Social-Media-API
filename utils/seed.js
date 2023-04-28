@@ -1,51 +1,75 @@
-const connection = require('../config/connection');
-const { Course, Student } = require('../models');
-const { getRandomName, getRandomAssignments } = require('./data');
+const { faker } = require("@faker-js/faker");
+const db = require("../config/connection");
+const { Thought, User } = require("../models");
 
-connection.on('error', (err) => err);
+db.once("open", async () => {
+  await Thought.deleteMany({});
+  await User.deleteMany({});
 
-connection.once('open', async () => {
-  console.log('connected');
+  // create user data
+  const userData = [];
 
-  // Drop existing courses
-  await Course.deleteMany({});
+  for (let i = 0; i < 5; i += 1) {
+    const username = faker.internet.userName();
+    const email = faker.internet.email(username);
 
-  // Drop existing students
-  await Student.deleteMany({});
-
-  // Create empty array to hold the students
-  const students = [];
-
-  // Loop 20 times -- add students to the students array
-  for (let i = 0; i < 20; i++) {
-    // Get some random assignment objects using a helper function that we imported from ./data
-    const assignments = getRandomAssignments(20);
-
-    const fullName = getRandomName();
-    const first = fullName.split(' ')[0];
-    const last = fullName.split(' ')[1];
-    const github = `${first}${Math.floor(Math.random() * (99 - 18 + 1) + 18)}`;
-
-    students.push({
-      first,
-      last,
-      github,
-      assignments,
-    });
+    userData.push({ username, email });
   }
 
-  // Add students to the collection and await the results
-  await Student.collection.insertMany(students);
+  const createdUsers = await User.insertMany(userData);
 
-  // Add courses to the collection and await the results
-  await Course.collection.insertOne({
-    courseName: 'UCLA',
-    inPerson: false,
-    students: [...students],
-  });
+  // create friends
+  for (let i = 0; i < 10; i += 1) {
+    const randomUserIndex = Math.floor(Math.random() * createdUsers.length);
+    const { _id: userId } = createdUsers[randomUserIndex];
 
-  // Log out the seed data to indicate what should appear in the database
-  console.table(students);
-  console.info('Seeding complete! 🌱');
+    let friendId = userId;
+
+    while (friendId === userId) {
+      const randomUserIndex = Math.floor(Math.random() * createdUsers.length);
+      friendId = createdUsers[randomUserIndex];
+    }
+
+    await User.updateOne({ _id: userId }, { $addToSet: { friends: friendId } });
+  }
+
+  // create thoughts
+  let createdThoughts = [];
+  for (let i = 0; i < 10; i += 1) {
+    const thoughtText = faker.lorem.words(Math.round(Math.random() * 20) + 1);
+
+    const randomUserIndex = Math.floor(Math.random() * createdUsers.length);
+    const { username, _id: userId } = createdUsers[randomUserIndex];
+
+    const createdThought = await Thought.create({ thoughtText, username });
+
+    const updatedUser = await User.updateOne(
+      { _id: userId },
+      { $push: { thoughts: createdThought._id } }
+    );
+
+    createdThoughts.push(createdThought);
+  }
+
+  // create reactions
+  for (let i = 0; i < 10; i += 1) {
+    const reactionBody = faker.lorem.words(Math.round(Math.random() * 20) + 1);
+
+    const randomUserIndex = Math.floor(Math.random() * createdUsers.length);
+    const { username } = createdUsers[randomUserIndex];
+
+    const randomThoughtIndex = Math.floor(
+      Math.random() * createdThoughts.length
+    );
+    const { _id: thoughtId } = createdThoughts[randomThoughtIndex];
+
+    await Thought.updateOne(
+      { _id: thoughtId },
+      { $push: { reactions: { reactionBody, username } } },
+      { runValidators: true }
+    );
+  }
+
+  console.log("all done!");
   process.exit(0);
 });
