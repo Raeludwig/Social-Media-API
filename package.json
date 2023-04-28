@@ -1,16 +1,21 @@
 {
-  "name": "social-media-api",
+  "name": "social-network-api",
   "version": "1.0.0",
-  "description": "<h1 align=\"center\">\r   <br>\r   <a><img src=\"https://user-images.githubusercontent.com/118871515/216512901-047c0cab-c16f-45e6-a7c8-bc2f10833c85.png\" alt=\"Job Finder\" width=\"200\"></a>\r   <br>\r   Job Finder\r   <br>\r </h1>",
+  "description": "Data for social media sites",
   "main": "index.js",
+  "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index",
+    "dev": "nodemon index",
+    "seed": "node utils/seed"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.0.5"
+    "@faker-js/faker": "^7.6.0",
+    "express": "^4.17.1",
+    "faker": "^5.5.3",
+    "mongoose": "^7.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.9"
   }
 }
